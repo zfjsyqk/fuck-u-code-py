@@ -1,7 +1,7 @@
 # fuck-u-code (Python 版)
 
 > 一款 **轻量级的多语言屎山代码检测工具**。
-> 灵感来自 [zfjsyqk/fuck-u-code (Go 版)](https://github.com/zfjsyqk/fuck-u-code)，
+> 灵感来自 [fuck-u-code (Go 版)](https://github.com/Done-0/fuck-u-code)，
 > 用 Python 实现，便于跨平台快速使用，无需额外依赖。
 
 ---
