@@ -1,136 +1,177 @@
-# Code Scorer
+# fuck-u-code (Python 版)
 
-`code_scorer.py` 是一个 **多语言代码质量评分工具**，支持自动检测代码语言并进行静态评分，帮助开发者快速评估代码质量。
+> 一款 **轻量级的多语言屎山代码检测工具**。
+> 灵感来自 [zfjsyqk/fuck-u-code (Go 版)](https://github.com/zfjsyqk/fuck-u-code)，
+> 用 Python 实现，便于跨平台快速使用，无需额外依赖。
+
+---
 
 ## 功能特点
 
-* ✅ 支持多语言代码分析：
+* **多语言支持**：
+  Go / JavaScript / TypeScript / Python / Java / C / C++ / Rust / Swift / Objective-C / Dart
+* **代码屎山评分**（0 \~ 100，越高越屎）：
 
-  * Python、Java、Swift、Objective-C、Dart、C、C++、JavaScript、TypeScript、Go
-* ✅ 自动检测代码语言（根据文件扩展名或关键字）
-* ✅ 代码质量评分维度：
+  * 循环复杂度
+  * 最大嵌套层数
+  * 平均函数长度
+  * 注释覆盖率
+  * 命名异味（过短/过长/全大写变量）
+  * 重复度（滑动窗口重复块）
+  * 错误处理令牌（try/except/catch/throw …）
+*  **多种输出格式**：
 
-  * 可读性 (Readability)
-  * 复杂度 (Complexity)
-  * 注释质量 (Comments)
-  * 结构设计 (Structure)
-  * 代码规范 (Standards)
-* ✅ 支持 JSON 格式输出，方便集成 CI/CD 或其他工具
-* ✅ 命令行工具，使用简单
+  * 彩色终端摘要/详细视图
+  * Markdown 报告（适合 CI/CD 或文档）
+*  **灵活控制**：
+
+  * 排除文件/目录
+  * 跳过 `index.js/ts` 等文件
+  * 仅显示前 N 个最烂文件
+  * 中英文支持
 
 ---
 
 ## 安装
 
-克隆仓库：
+本工具 **无第三方依赖**，只需 Python 3.8+ 即可运行。
 
 ```bash
-git clone <repository_url>
-cd <repository_directory>
+git clone https://github.com/yourname/fuck-u-code-py.git
+cd fuck-u-code-py
 ```
-
-（可选）安装依赖：
-
-```bash
-pip install -r requirements.txt
-```
-
-> 本工具主要依赖 Python 标准库，无额外依赖。
 
 ---
 
 ## 使用方法
 
-命令行运行：
+基本用法：
 
 ```bash
-python code_scorer.py <file_path> [--lang <language>] [--json]
+python fuck_u_code.py [命令] [选项] [路径]
 ```
 
-### 参数说明
+### 常见示例
 
-* `<file_path>`: 需要分析的代码文件路径
-* `--lang <language>`: 指定语言（如 `python`, `java`, `cpp` 等），默认 `auto` 自动识别
-* `--json`: 输出 JSON 格式评分结果
+```bash
+# 分析当前目录（默认摘要）
+python fuck_u_code.py
+
+# 指定 analyze 命令
+python fuck_u_code.py analyze .
+
+# 显示详细报告
+python fuck_u_code.py --verbose
+
+# 只看最屎的 3 个文件
+python fuck_u_code.py --top 3
+
+# 输出 Markdown 格式（可重定向保存）
+python fuck_u_code.py --markdown > report.md
+
+# 英文输出
+python fuck_u_code.py --lang en-US --verbose
+
+# 排除路径（支持多次）
+python fuck_u_code.py -e "**/test/**" -e "**/dist/**"
+
+# 跳过 index 文件
+python fuck_u_code.py --skipindex
+```
 
 ---
 
-### 示例
+## 参数说明
 
-分析一个 Python 文件：
-
-```bash
-python code_scorer.py example.py --lang python
-```
-
-自动检测语言：
-
-```bash
-python code_scorer.py example.swift
-```
-
-输出 JSON 格式：
-
-```bash
-python code_scorer.py code_scorer.py --json
-```
+| 参数                              | 说明                          | 默认值       |
+| ------------------------------- | --------------------------- | --------- |
+| `路径`                            | 要扫描的文件或目录                   | `.`（当前目录） |
+| `--lang`                        | 输出语言（`zh-CN` / `en-US`）     | `zh-CN`   |
+| `--verbose`                     | 显示详细报告                      | 关闭        |
+| `--markdown`                    | 输出 Markdown 表格              | 关闭        |
+| `--top N`                       | 只显示前 N 个最烂文件                | 0（不限制）    |
+| `-e PATTERN, --exclude PATTERN` | 排除路径（支持多次）                  | 无         |
+| `--skipindex`                   | 跳过 `index.js`/`index.ts` 文件 | 关闭        |
 
 ---
 
 ## 输出示例
 
-### 默认输出（文本形式）
+### 终端摘要
 
 ```
-文件: example.py
+正在分析 12 个文件...
+
+最屎文件 TOP 3:
+1. src/utils/helpers.js  分数: 87 (等级: E)
+2. main.py               分数: 72 (等级: D)
+3. core/service.go       分数: 65 (等级: C)
+
+平均分: 54/100
+```
+
+### 详细模式 (`--verbose`)
+
+```
+文件: main.py
 语言: python
-总分: 83/100
+分数: 72 (等级 D)
 
-详细评分:
-- 可读性(Readability): 20/25
-- 复杂度(Complexity): 18/20
-- 注释质量(Comments): 15/20
-- 结构设计(Structure): 15/20
-- 代码规范(Standards): 15/15
+指标详情:
+- 循环复杂度: 12
+- 最大嵌套层数: 5
+- 平均函数长度: 48 行
+- 注释覆盖率: 8%
+- 命名异味: 3 个
+- 重复度: 15%
+- 错误处理: 1 处
+
+-------------------------------------------------------
 ```
 
-### JSON 输出
+### Markdown 格式 (`--markdown`)
 
-```json
-{
-  "file": "example.py",
-  "language": "python",
-  "score": 83,
-  "details": {
-    "readability": 20,
-    "complexity": 18,
-    "comments": 15,
-    "structure": 15,
-    "standards": 15
-  }
-}
+```markdown
+| 文件 | 语言 | 分数 | 等级 | 循环复杂度 | 最大嵌套 | 平均函数行数 | 注释覆盖率 | 异味 | 重复度 | 错误处理 |
+|------|------|------|------|------------|----------|--------------|------------|------|--------|----------|
+| main.py | python | 72 | D | 12 | 5 | 48 | 8% | 3 | 15% | 1 |
+| utils.js | javascript | 87 | E | 15 | 6 | 52 | 5% | 6 | 20% | 0 |
 ```
 
 ---
 
-## 支持的语言
+## 支持语言
 
 * Python (`.py`)
+* Go (`.go`)
 * Java (`.java`)
+* JavaScript (`.js`)
+* TypeScript (`.ts`)
+* C (`.c`)
+* C++ (`.cpp`, `.cc`, `.cxx`)
+* Rust (`.rs`)
 * Swift (`.swift`)
 * Objective-C (`.m`, `.mm`)
 * Dart (`.dart`)
-* C (`.c`)
-* C++ (`.cpp`, `.cc`)
-* JavaScript (`.js`)
-* TypeScript (`.ts`)
-* Go (`.go`)
+
+---
+
+## 实现原理
+
+* **语言识别**：基于扩展名，简单高效
+* **循环复杂度**：统计 `if/for/while/switch/&&/||` 等关键字
+* **最大嵌套**：括号/缩进层次模拟
+* **函数行数**：匹配 `def|func|class|void` 等函数定义
+* **注释覆盖率**：行数比例（注释行 / 总行）
+* **命名异味**：变量名过短/过长/全大写
+* **重复度**：滑动窗口（5 行）检测重复
+* **错误处理**：`try/catch/throw/except` 出现次数
 
 ---
 
 ## 贡献
 
-欢迎提交 Issue 或 Pull Request，改进评分算法或扩展支持语言。
+欢迎提 Issue 或 PR 来改进算法、增加语言支持，或优化评分规则。
 
 ---
 
